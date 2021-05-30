@@ -56,23 +56,15 @@ public class SmogmogKit extends AbstractKit implements Listener {
         cloud.setDuration(effectDuration * 20);
         cloud.setSource(player);
         cloud.setRadius(radius);
-        cloud.setBasePotionData(new PotionData(potionType, false, false));
         cloud.setRadius(radius);
         KitPlayer kitPlayer = KitApi.getInstance().getPlayer(player);
         kitPlayer.activateKitCooldown(this);
         player.getLocation().getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 0.2f, 0);
-    }
 
-    @EventHandler
-    public void onAreaEffectCloudDamage(EntityDamageByEntityEvent e) {
-        if (e.getEntity() instanceof Player && e.getDamager() instanceof AreaEffectCloud) {
-            Player involved = (Player) e.getEntity();
-            AreaEffectCloud cloud = (AreaEffectCloud) e.getDamager();
-            if (involved.getUniqueId().toString().equals(cloud.getCustomName())) {
-                e.setCancelled(true);
-            }
-            else {
-                involved.addPotionEffect(new PotionEffect(extraPotionEffectType, effectDuration * 20, 0));
+        for (Player p : (Player[]) player.getNearbyEntities(radius, radius, radius).stream().filter(entity -> entity instanceof Player).toArray()) {
+            if (p.getUniqueId() != player.getUniqueId()) {
+                p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, effectDuration * 20, 0));
+                p.addPotionEffect(new PotionEffect(PotionEffectType.POISON, effectDuration * 20, 0));
             }
         }
     }
